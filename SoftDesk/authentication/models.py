@@ -34,8 +34,12 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
 
-    email = models.EmailField('email address', unique=True)
+    email = models.EmailField(unique=True, max_length=255, blank=False)
     username = None
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     objects = UserManager()
 

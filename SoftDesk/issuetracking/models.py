@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from authentication.models import User
 
 
 class Project(models.Model):
@@ -24,8 +25,8 @@ class Project(models.Model):
     desc = models.CharField(max_length=500, blank=True)
     type = models.CharField(choices=TYPE, max_length=2)
     status = models.CharField(choices=STATUS, max_length=2)
-    contributors = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, through='Contributor', related_name='contributions')
+
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Contributor(models.Model):
@@ -46,13 +47,14 @@ class Contributor(models.Model):
         (COLLAB, 'COLLAB'),
     ]
 
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    contributor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     permission = models.CharField(choices=PERMISSIONS, default='READ', max_length=2)
     role = models.CharField(choices=ROLES, max_length=2)
 
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
     class Meta:
-        unique_together = ('project', 'contributor')
+        unique_together = ('project', 'user')
 
 
 class Issue(models.Model):
@@ -66,10 +68,10 @@ class Issue(models.Model):
 
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE,
                                    related_name='issues')
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,
+    author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
                                related_name='author')
-    assign = models.ForeignKey(settings.AUTH_USER_MODEL,
+    assign = models.ForeignKey(User,
                                null=True,
                                on_delete=models.CASCADE,
                                related_name='assign')
@@ -80,5 +82,5 @@ class Comments(models.Model):
     desc = models.CharField(max_length=500)
     created_time = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
