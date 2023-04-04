@@ -5,13 +5,15 @@ from authentication.models import User
 
 class Project(models.Model):
 
-    PROJET = 'PJ'
-    PRODUCT = 'PR'
-    APP = 'AP'
+    BACKEND = 'BE'
+    FRONTEND = 'FE'
+    IOS = 'IO'
+    ANDROID = 'AD'
     TYPE = [
-        (PROJET, 'PROJET'),
-        (PRODUCT, 'PRODUIT'),
-        (APP, 'APPLICATION'),
+        (BACKEND, 'Back-end'),
+        (FRONTEND, 'Front-end'),
+        (IOS, 'IOs'),
+        (ANDROID, 'Android'),
     ]
 
     DEV = 'DV'
@@ -50,7 +52,7 @@ class Contributor(models.Model):
     permission = models.CharField(choices=PERMISSIONS, default='READ', max_length=2)
     role = models.CharField(choices=ROLES, max_length=2)
 
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='contributors')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -59,11 +61,38 @@ class Contributor(models.Model):
 
 class Issue(models.Model):
 
+    FAIBLE = 'FA'
+    MOYENNE = 'MO'
+    ELEVEE = 'EL'
+    PRIORITY = [
+        (FAIBLE, 'Faible'),
+        (MOYENNE, 'Moyenne'),
+        (ELEVEE, 'Elevée'),
+    ]
+
+    BUG = 'BU'
+    AMELIORATION = 'AM'
+    TACHE = 'TA'
+    BALISE = [
+        (BUG, 'Bug'),
+        (AMELIORATION, 'Amélioration'),
+        (TACHE, 'Tâche'),
+    ]
+
+    FAIRE = 'FA'
+    COURS = 'EC'
+    TERMINE = 'TE'
+    STATUS = [
+        (FAIRE, 'A faire'),
+        (COURS, 'En cours'),
+        (TERMINE, 'Terminé'),
+    ]
+
     title = models.CharField(max_length=255)
     desc = models.CharField(max_length=500)
-    tag = models.CharField(max_length=255)
-    priority = models.CharField(max_length=255)
-    status = models.CharField(max_length=255)
+    tag = models.CharField(choices=BALISE, max_length=255)
+    priority = models.CharField(choices=PRIORITY, max_length=255)
+    status = models.CharField(choices=STATUS, max_length=255)
     created_time = models.DateTimeField(auto_now_add=True)
 
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE,

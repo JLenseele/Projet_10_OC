@@ -6,13 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from authentication.models import User
-from authentication.serializers import UserSerializer
+from .models import User
+from .serializers import UserSerializer
 
 
 class CreateUserAPIView(APIView):
-    # On laisse l'autorisation à tous d'accéder à l'inscription
-    permission_classes = (AllowAny,)
 
     def post(self, request):
         user = request.data
