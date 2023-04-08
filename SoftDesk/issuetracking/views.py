@@ -1,11 +1,17 @@
-from django.shortcuts import render
-from rest_framework import request, status
-from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Project, Contributor, Issue, Comments
 from authentication.models import User
+from .permissions import IsAuthor, \
+    IsContributor, \
+    IsAuthorContributor, \
+    IsContributorContributor
+from .models import Project, \
+    Contributor, \
+    Issue, \
+    Comments
 from .serializers import ProjectSerializer, \
     ProjectDetailSerializer, \
     ContributorSerializer, ContributorProjectSerializer, \
@@ -17,12 +23,14 @@ class ProjectViewset(ModelViewSet):
 
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
-
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthor | IsContributor]
 
     def get_queryset(self):
         user = self.request.user
-        return Project.objects.filter(author=user.id)
+        return Project.objects.filter(
+            Q(author=user.id) |
+            Q(contributors__user=user)
+        ).distinct()
 
     def get_serializer_class(self):
         actions = ['retrieve', 'create', 'update']
@@ -34,9 +42,10 @@ class ProjectViewset(ModelViewSet):
 class ContributorViewset(ModelViewSet):
 
     serializer_class = ContributorSerializer
+    permission_classes = [IsAuthorContributor | IsContributorContributor]
 
     def get_queryset(self):
-        return Contributor.objects.all()
+        return Contributor.objects.filter(project_id=self.kwargs["project_pk"])
 
     def create(self, request, *args, **kwargs):
         serializer = ContributorProjectSerializer(data=request.data)
@@ -59,9 +68,9 @@ class IssueViewset(ModelViewSet):
 
     serializer_class = IssueSerializer
     detail_serializer_class = IssueProjectSerializer
+    permission_classes = [IsAuthor | IsContributor]
 
     def get_queryset(self):
-        print(self.kwargs)
         return Issue.objects.filter(project_id=self.kwargs["project_pk"])
 
     def get_serializer_class(self):
@@ -88,9 +97,9 @@ class CommentViewset(ModelViewSet):
 
     serializer_class = CommentSerializer
     detail_serializer_class = CommentIssueSerializer
+    permission_classes = [IsAuthor | IsContributor]
 
     def get_queryset(self):
-        print(self.kwargs)
         return Comments.objects.filter(issue=self.kwargs["issue_pk"])
 
     def get_serializer_class(self):

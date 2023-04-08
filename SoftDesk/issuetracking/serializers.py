@@ -1,20 +1,19 @@
 from rest_framework.serializers import ModelSerializer
-from issuetracking.models import Project, Contributor, Issue, Comments
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from .models import Project, Contributor, Issue, Comments
 
 
 class ProjectSerializer(ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ['id', 'title', 'author']
+        fields = ['id', 'title', 'author', 'contributors']
 
 
 class ContributorSerializer(ModelSerializer):
 
     class Meta:
         model = Contributor
-        fields = ['id', 'user', 'role', 'permission', 'project']
+        fields = ['user', 'id', 'role', 'permission', 'project']
 
 
 class ContributorProjectSerializer(ModelSerializer):
@@ -26,11 +25,11 @@ class ContributorProjectSerializer(ModelSerializer):
 
 class ProjectDetailSerializer(ModelSerializer):
 
-    contributors = ContributorSerializer(many=True, read_only=True)
+    contributor = ContributorSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = ['id', 'title', 'type', 'status', 'author', 'contributors']
+        fields = ['id', 'title', 'type', 'status', 'author', 'contributor']
 
 
 class IssueSerializer(ModelSerializer):
@@ -44,7 +43,7 @@ class IssueProjectSerializer(ModelSerializer):
 
     class Meta:
         model = Issue
-        fields = ['id', 'title', 'desc', 'tag', 'priority', 'status', 'assign']
+        fields = ['id', 'title', 'desc', 'tag', 'priority', 'status', 'author', 'assign']
 
 
 class CommentSerializer(ModelSerializer):
@@ -58,4 +57,4 @@ class CommentIssueSerializer(ModelSerializer):
 
     class Meta:
         model = Comments
-        fields = ['desc']
+        fields = ['desc', 'author', 'issue', 'created_time']
