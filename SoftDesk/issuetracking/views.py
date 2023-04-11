@@ -4,10 +4,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from authentication.models import User
-from .permissions import IsAuthor, \
-    IsContributor, \
-    IsAuthorContributor, \
-    IsContributorContributor
+from .permissions import IsAuthenticated, \
+    IsProjectAuthorContributor, \
+    IsObjectAuthor
 from .models import Project, \
     Contributor, \
     Issue, \
@@ -23,14 +22,15 @@ class ProjectViewset(ModelViewSet):
 
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
-    permission_classes = [IsAuthor | IsContributor]
+    permission_classes = [IsProjectAuthorContributor | IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        return Project.objects.filter(
+        queryset = Project.objects.filter(
             Q(author=user.id) |
             Q(contributors__user=user)
         ).distinct()
+        return queryset
 
     def get_serializer_class(self):
         actions = ['retrieve', 'create', 'update']
@@ -42,7 +42,7 @@ class ProjectViewset(ModelViewSet):
 class ContributorViewset(ModelViewSet):
 
     serializer_class = ContributorSerializer
-    permission_classes = [IsAuthorContributor | IsContributorContributor]
+    permission_classes = [IsProjectAuthorContributor]
 
     def get_queryset(self):
         return Contributor.objects.filter(project_id=self.kwargs["project_pk"])
@@ -68,7 +68,7 @@ class IssueViewset(ModelViewSet):
 
     serializer_class = IssueSerializer
     detail_serializer_class = IssueProjectSerializer
-    permission_classes = [IsAuthor | IsContributor]
+    permission_classes = [IsObjectAuthor]
 
     def get_queryset(self):
         return Issue.objects.filter(project_id=self.kwargs["project_pk"])
@@ -97,7 +97,7 @@ class CommentViewset(ModelViewSet):
 
     serializer_class = CommentSerializer
     detail_serializer_class = CommentIssueSerializer
-    permission_classes = [IsAuthor | IsContributor]
+    permission_classes = [IsProjectAuthorContributor | IsObjectAuthor]
 
     def get_queryset(self):
         return Comments.objects.filter(issue=self.kwargs["issue_pk"])
