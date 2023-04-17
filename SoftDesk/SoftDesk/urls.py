@@ -39,9 +39,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('rest_framework.urls')),
     path('signup/', CreateUserAPIView.as_view(), name='create_user'),
+
     path('', include(router.urls)),
     path('', include(projects_router.urls)),
     path('', include(issue_router.urls)),
+
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
