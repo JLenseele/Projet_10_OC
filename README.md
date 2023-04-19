@@ -1,4 +1,4 @@
-#SOFTDESK API
+# SOFTDESK API
 
 ## Requirements
 
@@ -26,3 +26,7 @@ Le rapport sera disponible dans ./flake-report/index.html
 #### Lancer le serveur
 
     python softdesk\manage.py runserver
+
+## Documentation POSTMAN
+
+    Vous trouverez sur le lien suivant, la documentation complète des différents EndPoints de l'API
