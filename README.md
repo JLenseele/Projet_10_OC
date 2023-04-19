@@ -29,4 +29,6 @@ Le rapport sera disponible dans ./flake-report/index.html
 
 ## Documentation POSTMAN
 
-    Vous trouverez sur le lien suivant, la documentation complète des différents EndPoints de l'API
+Vous trouverez sur le lien suivant, la documentation complète des différents EndPoints de l'API  
+    
+    https://documenter.getpostman.com/view/24506495/2s93Y2QgKY
