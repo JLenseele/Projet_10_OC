@@ -22,10 +22,11 @@ from issuetracking.views import ProjectViewset,\
     ContributorViewset,\
     IssueViewset,\
     CommentViewset
-from authentication.views import CreateUserAPIView
+from authentication.views import CreateUserAPIView, AccountUserAPIView
 
 router = routers.SimpleRouter()
 router.register(r'projects', ProjectViewset, basename='project')
+router.register(r'account', AccountUserAPIView, basename='account-user')
 
 projects_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')
 projects_router.register(r'users', ContributorViewset, basename='project-contributors')
